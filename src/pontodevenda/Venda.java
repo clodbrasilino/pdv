@@ -5,6 +5,9 @@
  */
 package pontodevenda;
 
+import java.util.LinkedList;
+import java.util.List;
+
 /**
  *
  * @author clodbrasilino
@@ -16,7 +19,7 @@ public class Venda {
     Integer id;
     String cpf;
     Double total;
-    ItemDeVenda[] itens = new ItemDeVenda[0];
+    List<ItemDeVenda> itens = new LinkedList();
     
     Venda(){
         this.id = Venda.sequenciaDeCompras++;
@@ -29,12 +32,14 @@ public class Venda {
     }
     
     void adicionarItem(ItemDeVenda novoItem){
-        ItemDeVenda[] vetorAntigo = itens;
+        
+        itens.add(novoItem);
+        /*ItemDeVenda[] vetorAntigo = itens;
         itens = new ItemDeVenda[itens.length+1];
         for(int i = 0; i < vetorAntigo.length; ++i){
             this.itens[i] = vetorAntigo[i];
         }
-        itens[itens.length-1] = novoItem;
+        itens[itens.length-1] = novoItem;*/
     }
     
 }

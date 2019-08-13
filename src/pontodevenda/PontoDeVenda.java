@@ -5,6 +5,8 @@
  */
 package pontodevenda;
 
+import java.util.Collection;
+import java.util.LinkedList;
 import java.util.Scanner;
 
 /**
@@ -21,6 +23,8 @@ public class PontoDeVenda {
      * @param args the command line arguments
      */
     public static void main(String[] args) {
+        Collection c1 = new LinkedList();
+        c1.add(new Object());
         PontoDeVenda pdv = new PontoDeVenda();
         
         while(true) {
@@ -143,15 +147,27 @@ public class PontoDeVenda {
         entrada.nextLine();
         vendaAtual.adicionarItem(new ItemDeVenda(produtos[idProduto-1],qtde));
         vendaAtual.total = 0.0;
-        for(int i = 0; i < vendaAtual.itens.length; ++i){
-            vendaAtual.total += vendaAtual.itens[i].subtotal;
+        for(ItemDeVenda item: vendaAtual.itens){
+            vendaAtual.total += item.subtotal;
         }
+        
     }
 
     private void imprimirCupom() {
         Venda vendaAtual = vendas[vendas.length-1];
         System.out.print("\n\n   NOTA FISCAL\n\n");
-        for(int i = 0; i < vendaAtual.itens.length; ++i){
+        int i = 0;
+        for(ItemDeVenda abacaxi: vendaAtual.itens){
+            System.out.printf("%d\t%s\t%d x R$%.2f\tR$%.2f\n\t\t\tT%.2f%%\n",
+                    ++i,
+                    abacaxi.produto.descricao,
+                    abacaxi.quantidade,
+                    abacaxi.produto.precoUnitario,
+                    abacaxi.subtotal,
+                    abacaxi.produto.aliquota*100);
+        }
+            
+        /*for(int i = 0; i < vendaAtual.itens.length; ++i){
             System.out.printf("%d\t%s\t%d x R$%.2f\tR$%.2f\n\t\t\tT%.2f%%\n",
                     i+1,
                     vendaAtual.itens[i].produto.descricao,
@@ -159,7 +175,7 @@ public class PontoDeVenda {
                     vendaAtual.itens[i].produto.precoUnitario,
                     vendaAtual.itens[i].subtotal,
                     vendaAtual.itens[i].produto.aliquota*100);
-        }
+        }*/
         System.out.printf("TOTAL\t\t\t\t\tR$%.2f\n\n VOLTE SEMPRE! :)\n\n",vendaAtual.total);
     }
 }
