@@ -14,32 +14,29 @@ import java.util.List;
  */
 public class Venda {
     
-    static Integer sequenciaDeCompras = 1;
-    
-    Integer id;
+    Long id;
     String cpf;
     Double total;
     List<ItemDeVenda> itens = new LinkedList();
     
-    Venda(){
-        this.id = Venda.sequenciaDeCompras++;
-        this.total = 1.0;
+    Venda(Long id){
+        this.id = id;
+        this.total = 0.0;
     }
     
-    Venda(String cpf){
-        this();
+    Venda(Long id, String cpf){
+        this(id);
         this.cpf = cpf;
     }
     
+    Venda(Long id, String cpf, Double total){
+        this.id = id;
+        this.cpf = cpf;
+        this.total = total;
+    }
+    
     void adicionarItem(ItemDeVenda novoItem){
-        
         itens.add(novoItem);
-        /*ItemDeVenda[] vetorAntigo = itens;
-        itens = new ItemDeVenda[itens.length+1];
-        for(int i = 0; i < vetorAntigo.length; ++i){
-            this.itens[i] = vetorAntigo[i];
-        }
-        itens[itens.length-1] = novoItem;*/
     }
     
 }

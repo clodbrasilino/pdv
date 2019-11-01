@@ -10,11 +10,13 @@ package pontodevenda;
  * @author clodbrasilino
  */
 public class Produto {
-    String descricao;
-    Double precoUnitario;
-    Double aliquota;
+    public Long id;
+    public String descricao;
+    public Double precoUnitario;
+    public Double aliquota;
     
-    Produto(String descricao, Double precoUnitario, Double aliquota){
+    Produto(Long id, String descricao, Double precoUnitario, Double aliquota){
+        this.id = id;
         this.descricao = descricao;
         this.precoUnitario = precoUnitario;
         this.aliquota = aliquota;
