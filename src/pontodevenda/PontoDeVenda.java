@@ -5,6 +5,9 @@
  */
 package pontodevenda;
 
+import pontodevenda.modelo.Produto;
+import pontodevenda.modelo.ItemDeVenda;
+import pontodevenda.modelo.Venda;
 import java.util.Scanner;
 import java.sql.DriverManager;
 import java.sql.SQLException;
@@ -34,6 +37,8 @@ public class PontoDeVenda {
     
     /**
      * @param args the command line arguments
+     * @throws java.lang.ClassNotFoundException
+     * @throws java.sql.SQLException
      */
     public static void main(String[] args) throws ClassNotFoundException, SQLException {
         PontoDeVenda pdv = new PontoDeVenda();
@@ -166,7 +171,7 @@ public class PontoDeVenda {
     }
 
     public LinkedList<Produto> obterProdutosDoBanco() throws SQLException {
-        LinkedList<Produto> produtosDoBanco = new LinkedList<Produto>();
+        LinkedList<Produto> produtosDoBanco = new LinkedList();
         PreparedStatement consulta = conexao.prepareStatement(
                 "SELECT id, nome, valor_unitario, imposto FROM produto");
         ResultSet dadosDoBanco = consulta.executeQuery();

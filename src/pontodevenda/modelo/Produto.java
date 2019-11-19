@@ -3,7 +3,7 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package pontodevenda;
+package pontodevenda.modelo;
 
 /**
  *
@@ -15,7 +15,7 @@ public class Produto {
     public Double precoUnitario;
     public Double aliquota;
     
-    Produto(Long id, String descricao, Double precoUnitario, Double aliquota){
+    public Produto(Long id, String descricao, Double precoUnitario, Double aliquota){
         this.id = id;
         this.descricao = descricao;
         this.precoUnitario = precoUnitario;

@@ -3,7 +3,7 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package pontodevenda;
+package pontodevenda.modelo;
 
 import java.util.LinkedList;
 import java.util.List;
@@ -14,28 +14,28 @@ import java.util.List;
  */
 public class Venda {
     
-    Long id;
-    String cpf;
-    Double total;
-    List<ItemDeVenda> itens = new LinkedList();
+    public Long id;
+    public String cpf;
+    public Double total;
+    public List<ItemDeVenda> itens = new LinkedList();
     
-    Venda(Long id){
+    public Venda(Long id){
         this.id = id;
         this.total = 0.0;
     }
     
-    Venda(Long id, String cpf){
+    public Venda(Long id, String cpf){
         this(id);
         this.cpf = cpf;
     }
     
-    Venda(Long id, String cpf, Double total){
+    public Venda(Long id, String cpf, Double total){
         this.id = id;
         this.cpf = cpf;
         this.total = total;
     }
     
-    void adicionarItem(ItemDeVenda novoItem){
+    public void adicionarItem(ItemDeVenda novoItem){
         itens.add(novoItem);
     }
     

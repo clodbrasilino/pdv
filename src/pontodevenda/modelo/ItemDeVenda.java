@@ -3,18 +3,18 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package pontodevenda;
+package pontodevenda.modelo;
 
 /**
  *
  * @author clodbrasilino
  */
 public class ItemDeVenda {
-    Integer quantidade;
-    Double subtotal;
-    Produto produto;
+    public Integer quantidade;
+    public Double subtotal;
+    public Produto produto;
     
-    ItemDeVenda(Produto produto, Integer quantidade){
+    public ItemDeVenda(Produto produto, Integer quantidade){
         this.produto = produto;
         this.quantidade = quantidade;
         this.subtotal = produto.precoUnitario * quantidade;

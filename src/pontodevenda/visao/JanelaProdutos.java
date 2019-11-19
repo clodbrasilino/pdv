@@ -12,7 +12,7 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.swing.table.DefaultTableModel;
 import pontodevenda.PontoDeVenda;
-import pontodevenda.Produto;
+import pontodevenda.modelo.Produto;
 
 /**
  *
