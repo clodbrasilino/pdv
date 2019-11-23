@@ -10,6 +10,7 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import java.util.regex.Pattern;
 import javax.swing.table.DefaultTableModel;
 import pontodevenda.PontoDeVenda;
 import pontodevenda.modelo.Produto;
@@ -46,8 +47,12 @@ public class JanelaProdutos extends javax.swing.JFrame {
         caixaTextoNomeProduto = new javax.swing.JTextField();
         textoPreco = new javax.swing.JLabel();
         caixaTextoPreco = new javax.swing.JTextField();
+        botaoApagarProduto = new javax.swing.JButton();
+        botaoEditar = new javax.swing.JButton();
+        botaoSalvar = new javax.swing.JButton();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
+        setTitle("Produtos");
         addWindowListener(new java.awt.event.WindowAdapter() {
             public void windowClosed(java.awt.event.WindowEvent evt) {
                 formWindowClosed(evt);
@@ -60,10 +65,10 @@ public class JanelaProdutos extends javax.swing.JFrame {
             }
         });
 
-        botaoCadastrarProduto.setText("Buscar no Banco");
+        botaoCadastrarProduto.setText("+");
         botaoCadastrarProduto.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
-                buscarProdutosDoBanco(evt);
+                inserirNovoProduto(evt);
             }
         });
 
@@ -78,6 +83,7 @@ public class JanelaProdutos extends javax.swing.JFrame {
                 "Title 1", "Title 2", "Title 3", "Title 4"
             }
         ));
+        atualizarTabela();
         jScrollPane1.setViewportView(tabelaProdutos);
 
         valorImpostoSlider.setToolTipText("");
@@ -99,30 +105,58 @@ public class JanelaProdutos extends javax.swing.JFrame {
         caixaTextoPreco.setHorizontalAlignment(javax.swing.JTextField.TRAILING);
         caixaTextoPreco.setText("R$ 0,00");
 
+        botaoApagarProduto.setText("-");
+        botaoApagarProduto.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                apagarProduto(evt);
+            }
+        });
+
+        botaoEditar.setText("Editar");
+        botaoEditar.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                editarProduto(evt);
+            }
+        });
+
+        botaoSalvar.setText("Salvar");
+        botaoSalvar.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                salvarProduto(evt);
+            }
+        });
+        botaoSalvar.setVisible(false);
+
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
         getContentPane().setLayout(layout);
         layout.setHorizontalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(layout.createSequentialGroup()
                 .addContainerGap()
-                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
-                    .addGroup(layout.createSequentialGroup()
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING, false)
+                    .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 0, Short.MAX_VALUE)
+                    .addGroup(javax.swing.GroupLayout.Alignment.LEADING, layout.createSequentialGroup()
                         .addComponent(textoImposto)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                         .addComponent(valorImpostoTextual)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(valorImpostoSlider, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
-                    .addComponent(jScrollPane1, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.PREFERRED_SIZE, 375, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addGroup(layout.createSequentialGroup()
+                        .addComponent(valorImpostoSlider, javax.swing.GroupLayout.DEFAULT_SIZE, 199, Short.MAX_VALUE))
+                    .addGroup(javax.swing.GroupLayout.Alignment.LEADING, layout.createSequentialGroup()
                         .addComponent(textoNomeProduto)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                         .addComponent(caixaTextoNomeProduto))
-                    .addGroup(layout.createSequentialGroup()
+                    .addGroup(javax.swing.GroupLayout.Alignment.LEADING, layout.createSequentialGroup()
                         .addComponent(textoPreco)
                         .addGap(5, 5, 5)
                         .addComponent(caixaTextoPreco, javax.swing.GroupLayout.PREFERRED_SIZE, 134, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addComponent(botaoCadastrarProduto, javax.swing.GroupLayout.PREFERRED_SIZE, 40, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addComponent(botaoApagarProduto, javax.swing.GroupLayout.PREFERRED_SIZE, 40, javax.swing.GroupLayout.PREFERRED_SIZE)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                        .addComponent(botaoCadastrarProduto)))
+                        .addComponent(botaoSalvar, javax.swing.GroupLayout.PREFERRED_SIZE, 60, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addComponent(botaoEditar, javax.swing.GroupLayout.PREFERRED_SIZE, 60, javax.swing.GroupLayout.PREFERRED_SIZE)))
                 .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
         layout.setVerticalGroup(
@@ -144,10 +178,12 @@ public class JanelaProdutos extends javax.swing.JFrame {
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(textoPreco)
                     .addComponent(caixaTextoPreco, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(botaoCadastrarProduto))
+                    .addComponent(botaoApagarProduto)
+                    .addComponent(botaoCadastrarProduto)
+                    .addComponent(botaoEditar)
+                    .addComponent(botaoSalvar))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 203, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addGap(38, 38, 38))
+                .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 276, javax.swing.GroupLayout.PREFERRED_SIZE))
         );
 
         pack();
@@ -165,7 +201,87 @@ public class JanelaProdutos extends javax.swing.JFrame {
         // TODO add your handling code here:
     }//GEN-LAST:event_formWindowDeactivated
 
-    private void buscarProdutosDoBanco(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_buscarProdutosDoBanco
+    private void inserirNovoProduto(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_inserirNovoProduto
+        String nome = caixaTextoNomeProduto.getText();
+        Double aliquota = new Double(valorImpostoSlider.getValue())/100;
+        String textoPreco = caixaTextoPreco.getText();
+        textoPreco = textoPreco.replaceAll("R\\$\\ ", "");
+        textoPreco = textoPreco.replaceAll(",", ".");
+        Double preco = Double.parseDouble(textoPreco);
+        try {
+            pdv.inserirNoBanco(new Produto(null, nome, preco, aliquota));
+        } catch (SQLException ex) {
+            Logger.getLogger(JanelaProdutos.class.getName()).log(Level.SEVERE, null, ex);
+        }
+        atualizarTabela();
+    }//GEN-LAST:event_inserirNovoProduto
+
+    private void valorImpostoSliderStateChanged(javax.swing.event.ChangeEvent evt) {//GEN-FIRST:event_valorImpostoSliderStateChanged
+        valorImpostoTextual.setText(valorImpostoSlider.getValue()+" %");
+    }//GEN-LAST:event_valorImpostoSliderStateChanged
+
+    private void apagarProduto(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_apagarProduto
+        Integer linha = tabelaProdutos.getSelectedRow();
+        Long id = Long.parseLong(
+                tabelaProdutos
+                    .getModel()
+                    .getValueAt(linha, 0)
+                    .toString()
+        );
+        try {
+            pdv.apagarNoBanco(new Produto(id, null, null, null));
+        } catch (SQLException ex) {
+            Logger.getLogger(JanelaProdutos.class.getName()).log(Level.SEVERE, null, ex);
+        }
+        atualizarTabela();
+    }//GEN-LAST:event_apagarProduto
+
+    private void editarProduto(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_editarProduto
+        botaoCadastrarProduto.setVisible(false);
+        botaoApagarProduto.setVisible(false);
+        botaoEditar.setVisible(false);
+        botaoSalvar.setVisible(true);
+        
+        int linha = tabelaProdutos.getSelectedRow();
+        
+        idSelecionado = (Long) tabelaProdutos.getModel().getValueAt(linha, 0);
+        String nomeSelecionado = (String) tabelaProdutos.getModel().getValueAt(linha, 1);
+        Double precoSelecionado = (Double) tabelaProdutos.getModel().getValueAt(linha, 2);
+        String impostoSelecionado = (String) tabelaProdutos.getModel().getValueAt(linha, 3);
+        
+        Integer imposto = Integer.parseInt(
+            impostoSelecionado.replaceAll("\\%", "").
+                replaceAll("\\.[0-9]","")
+        );
+        
+        valorImpostoSlider.setValue(imposto);
+        caixaTextoNomeProduto.setText(nomeSelecionado);
+        caixaTextoPreco.setText(precoSelecionado.toString());
+    }//GEN-LAST:event_editarProduto
+
+    private void salvarProduto(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_salvarProduto
+        botaoCadastrarProduto.setVisible(true);
+        botaoApagarProduto.setVisible(true);
+        botaoEditar.setVisible(true);
+        botaoSalvar.setVisible(false);
+        
+        Produto produtoAEditar = new Produto(
+            idSelecionado,
+            caixaTextoNomeProduto.getText(),
+            Double.parseDouble(caixaTextoPreco.getText()),
+            (new Double(valorImpostoSlider.getValue()))/100
+        );
+        
+        try {
+            pdv.editarNoBanco(produtoAEditar);
+        } catch (SQLException ex) {
+            Logger.getLogger(JanelaProdutos.class.getName()).log(Level.SEVERE, null, ex);
+        }
+        
+        atualizarTabela();
+    }//GEN-LAST:event_salvarProduto
+    
+    private void atualizarTabela(){
         String[] nomesDasColunas = {"ID","Nome","Preço Unitário","Alíquota"};
         List<Produto> doBanco = new LinkedList<Produto>();
         try {
@@ -188,49 +304,16 @@ public class JanelaProdutos extends javax.swing.JFrame {
             ++linha;
         }
         tabelaProdutos.setModel(new DefaultTableModel(matriz,nomesDasColunas));
-    }//GEN-LAST:event_buscarProdutosDoBanco
-
-    private void valorImpostoSliderStateChanged(javax.swing.event.ChangeEvent evt) {//GEN-FIRST:event_valorImpostoSliderStateChanged
-        valorImpostoTextual.setText(valorImpostoSlider.getValue()+" %");
-    }//GEN-LAST:event_valorImpostoSliderStateChanged
-
-    /**
-     * @param args the command line arguments
-     */
-    public static void main(String args[]) {
-        /* Set the Nimbus look and feel */
-        //<editor-fold defaultstate="collapsed" desc=" Look and feel setting code (optional) ">
-        /* If Nimbus (introduced in Java SE 6) is not available, stay with the default look and feel.
-         * For details see http://download.oracle.com/javase/tutorial/uiswing/lookandfeel/plaf.html 
-         */
-        try {
-            for (javax.swing.UIManager.LookAndFeelInfo info : javax.swing.UIManager.getInstalledLookAndFeels()) {
-                if ("Nimbus".equals(info.getName())) {
-                    javax.swing.UIManager.setLookAndFeel(info.getClassName());
-                    break;
-                }
-            }
-        } catch (ClassNotFoundException ex) {
-            java.util.logging.Logger.getLogger(JanelaProdutos.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
-        } catch (InstantiationException ex) {
-            java.util.logging.Logger.getLogger(JanelaProdutos.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
-        } catch (IllegalAccessException ex) {
-            java.util.logging.Logger.getLogger(JanelaProdutos.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
-        } catch (javax.swing.UnsupportedLookAndFeelException ex) {
-            java.util.logging.Logger.getLogger(JanelaProdutos.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
-        }
-        //</editor-fold>
-        /* Create and display the form */
-        java.awt.EventQueue.invokeLater(new Runnable() {
-            public void run() {
-                new JanelaProdutos().setVisible(true);
-            }
-        });
     }
+    
 
     private PontoDeVenda pdv;
+    private Long idSelecionado = -1l;
     // Variables declaration - do not modify//GEN-BEGIN:variables
+    private javax.swing.JButton botaoApagarProduto;
     private javax.swing.JButton botaoCadastrarProduto;
+    private javax.swing.JButton botaoEditar;
+    private javax.swing.JButton botaoSalvar;
     private javax.swing.JTextField caixaTextoNomeProduto;
     private javax.swing.JTextField caixaTextoPreco;
     private javax.swing.JScrollPane jScrollPane1;

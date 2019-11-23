@@ -17,6 +17,9 @@ public class ItemDeVenda {
     public ItemDeVenda(Produto produto, Integer quantidade){
         this.produto = produto;
         this.quantidade = quantidade;
-        this.subtotal = produto.precoUnitario * quantidade;
+        if(produto.precoUnitario != null)
+            this.subtotal = produto.precoUnitario * quantidade;
+        else
+            this.subtotal = 0.0;
     }
 }

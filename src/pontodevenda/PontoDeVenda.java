@@ -84,11 +84,7 @@ public class PontoDeVenda {
         System.out.print("Aliquota de Imposto: ");
         Double imposto = this.entrada.nextDouble();
         this.entrada.nextLine();
-        PreparedStatement consulta = conexao.prepareStatement("INSERT INTO produto(nome, valor_unitario, imposto) VALUES (?,?,?);");
-        consulta.setString(1, nome);
-        consulta.setDouble(2, valorUnitario);
-        consulta.setDouble(3, imposto);
-        int linhasAfetadas = consulta.executeUpdate();
+        int linhasAfetadas = inserirNoBanco(new Produto(null, nome, valorUnitario, imposto));
         if(linhasAfetadas == 1)
             System.out.print("\nProduto cadastrado com sucesso!\n\n");
     }
@@ -272,5 +268,98 @@ public class PontoDeVenda {
         } else {
             imprimirOpcaoInvalida();
         }
+    }
+
+    public int inserirNoBanco(Produto produto) throws SQLException {
+        PreparedStatement consulta = conexao.prepareStatement("INSERT INTO produto(nome, valor_unitario, imposto) VALUES (?,?,?);");
+        consulta.setString(1, produto.descricao);
+        consulta.setDouble(2, produto.precoUnitario);
+        consulta.setDouble(3, produto.aliquota);
+        return consulta.executeUpdate();
+    }
+    
+    public int apagarNoBanco(Produto p) throws SQLException{
+        PreparedStatement consulta = conexao.prepareStatement("DELETE FROM produto WHERE id = ?;");
+        consulta.setLong(1, p.id);
+        return consulta.executeUpdate();
+    }
+    
+    public int editarNoBanco(Produto p) throws SQLException{
+        PreparedStatement consulta = conexao.prepareStatement("UPDATE produto SET nome = ?, valor_unitario = ?, imposto = ? WHERE id = ?");
+        consulta.setLong(4, p.id);
+        consulta.setString(1, p.descricao);
+        consulta.setDouble(2, p.precoUnitario);
+        consulta.setDouble(3, p.aliquota);
+        return consulta.executeUpdate();
+    }
+    
+    public LinkedList<Venda> obterVendasDoBanco() throws SQLException {
+        LinkedList<Venda> vendasDoBanco = new LinkedList();
+        PreparedStatement consulta = conexao.prepareStatement(
+                "SELECT id, cpf, total FROM venda");
+        ResultSet dadosDoBanco = consulta.executeQuery();
+        while(dadosDoBanco.next()){
+            vendasDoBanco.add(
+                    new Venda(
+                            dadosDoBanco.getLong("id"),
+                            dadosDoBanco.getString("cpf"),
+                            dadosDoBanco.getDouble("total")
+                    )
+            );
+        }
+        return vendasDoBanco;
+    }
+    
+    public int inserirNoBanco(Venda venda) throws SQLException {
+        PreparedStatement consulta = conexao.prepareStatement("INSERT INTO venda(cpf, total) VALUES (?,?);");
+        consulta.setString(1, venda.cpf);
+        consulta.setDouble(2, venda.total);
+        return consulta.executeUpdate();
+    }
+    
+    public Venda obterUltimaVendaDoBanco() throws SQLException {
+        PreparedStatement pegaVendaDoBanco = conexao.prepareStatement(
+            "select id, cpf, total from venda WHERE id = (select max(id) from venda);");
+        ResultSet resultado = pegaVendaDoBanco.executeQuery();
+        resultado.next();
+        return new Venda(
+            resultado.getLong("id"), 
+            resultado.getString("cpf"),
+            resultado.getDouble("total"));
+    }
+    
+    public int inserirNoBanco(Venda v,ItemDeVenda iv) throws SQLException {
+        PreparedStatement consulta = conexao.prepareStatement("INSERT INTO item_de_venda(id_venda, quantidade, id_produto) VALUES (?,?,?);");
+        consulta.setLong(1, v.id);
+        consulta.setInt(2, iv.quantidade);
+        consulta.setLong(3, iv.produto.id);
+        return consulta.executeUpdate();
+    }
+
+    public List<ItemDeVenda> obterItensDeVendaDoBanco(Venda v) throws SQLException {
+        PreparedStatement pegaVendaDoBanco = conexao.prepareStatement(
+            "select iv.quantidade as quantidade, "
+                    + "p.id as id_produto, "
+                    + "p.nome as nome_produto, "
+                    + "p.valor_unitario as preco_produto, "
+                    + "p.imposto as aliquota_produto "
+                    + "FROM item_de_venda iv "
+                    + "JOIN produto p ON p.id = iv.id_produto "
+                    + "WHERE iv.id_venda = ?;");
+        pegaVendaDoBanco.setLong(1, v.id);
+        ResultSet resultado = pegaVendaDoBanco.executeQuery();
+        List<ItemDeVenda> doBanco = new LinkedList();
+        while(resultado.next()){
+            doBanco.add(new ItemDeVenda(
+                new Produto(
+                    resultado.getLong("id_produto"),
+                    resultado.getString("nome_produto"),
+                    resultado.getDouble("preco_produto"),
+                    resultado.getDouble("aliquota_produto")
+                ),
+                resultado.getInt("quantidade")
+            ));
+        }
+        return doBanco;
     }
 }

@@ -24,6 +24,12 @@ public class Venda {
         this.total = 0.0;
     }
     
+    public Venda(String cpf){
+        this.id = null;
+        this.cpf = cpf;
+        this.total = 0.0;
+    }
+    
     public Venda(Long id, String cpf){
         this(id);
         this.cpf = cpf;
@@ -37,6 +43,19 @@ public class Venda {
     
     public void adicionarItem(ItemDeVenda novoItem){
         itens.add(novoItem);
+        calcularTotal();
+    }
+    
+    public void removerItem(ItemDeVenda aSerRemovido){
+        itens.remove(aSerRemovido);
+        calcularTotal();
+    }
+
+    private void calcularTotal() {
+        this.total = 0.0;
+        for(ItemDeVenda iv: itens){
+            this.total += iv.subtotal;
+        }
     }
     
 }

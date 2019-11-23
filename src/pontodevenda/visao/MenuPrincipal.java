@@ -97,7 +97,14 @@ public class MenuPrincipal extends javax.swing.JFrame {
     }//GEN-LAST:event_abrirJanelaProdutos
 
     private void abrirJanelaVendas(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_abrirJanelaVendas
-        // TODO add your handling code here:
+        java.awt.EventQueue.invokeLater(new Runnable() {
+            public void run() {
+                if(janelaVendas == null)
+                    janelaVendas = new JanelaVendas();
+                janelaVendas.setDefaultCloseOperation(JFrame.HIDE_ON_CLOSE);
+                janelaVendas.setVisible(true);
+            }
+        });
     }//GEN-LAST:event_abrirJanelaVendas
 
     /**
@@ -141,4 +148,5 @@ public class MenuPrincipal extends javax.swing.JFrame {
     private javax.swing.JLabel jLabel1;
     // End of variables declaration//GEN-END:variables
     private JanelaProdutos janelaProdutos;
+    private JanelaVendas janelaVendas;
 }
