@@ -6,6 +6,7 @@
 package pontodevenda.visao;
 
 import java.sql.SQLException;
+import java.text.DecimalFormat;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Vector;
@@ -24,6 +25,11 @@ import pontodevenda.modelo.Venda;
  */
 public class JanelaItensDeVenda extends javax.swing.JFrame {
 
+    private final int ID = 0;
+    private final int NOME_PRODUTO = 1;
+    private final int QUANTIDADE = 2;
+    private final int SUBTOTAL = 3;
+    
     /**
      * Creates new form JanelaProdutos
      */
@@ -54,7 +60,7 @@ public class JanelaItensDeVenda extends javax.swing.JFrame {
         botaoApagarVenda = new javax.swing.JButton();
         comboProdutos = new javax.swing.JComboBox<>();
         spinnerQtde = new javax.swing.JSpinner();
-        jLabel1 = new javax.swing.JLabel();
+        labelTotal = new javax.swing.JLabel();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
         setTitle("Vendas");
@@ -87,17 +93,17 @@ public class JanelaItensDeVenda extends javax.swing.JFrame {
         botaoApagarVenda.setText("-");
         botaoApagarVenda.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
-                apagarProduto(evt);
+                apagarItemDeVenda(evt);
             }
         });
 
         comboProdutos.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "Item 1", "Item 2", "Item 3", "Item 4" }));
         preencherComboBoxProdutos();
 
-        jLabel1.setFont(new java.awt.Font("Lucida Grande", 0, 24)); // NOI18N
-        jLabel1.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
-        jLabel1.setText("Total: R$ 0.0");
-        jLabel1.setToolTipText("");
+        labelTotal.setFont(new java.awt.Font("Lucida Grande", 0, 24)); // NOI18N
+        labelTotal.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
+        labelTotal.setText("Total: R$ 0.0");
+        labelTotal.setToolTipText("");
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
         getContentPane().setLayout(layout);
@@ -107,7 +113,7 @@ public class JanelaItensDeVenda extends javax.swing.JFrame {
                 .addContainerGap()
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addGroup(layout.createSequentialGroup()
-                        .addComponent(jLabel1, javax.swing.GroupLayout.PREFERRED_SIZE, 352, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addComponent(labelTotal, javax.swing.GroupLayout.PREFERRED_SIZE, 352, javax.swing.GroupLayout.PREFERRED_SIZE)
                         .addGap(0, 0, Short.MAX_VALUE))
                     .addGroup(layout.createSequentialGroup()
                         .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 352, javax.swing.GroupLayout.PREFERRED_SIZE)
@@ -145,7 +151,7 @@ public class JanelaItensDeVenda extends javax.swing.JFrame {
                 .addGap(12, 12, 12)
                 .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 276, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(jLabel1, javax.swing.GroupLayout.PREFERRED_SIZE, 74, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addComponent(labelTotal, javax.swing.GroupLayout.PREFERRED_SIZE, 74, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
 
@@ -171,13 +177,25 @@ public class JanelaItensDeVenda extends javax.swing.JFrame {
         atualizarTotal();
     }//GEN-LAST:event_inserirItemDeVenda
 
-    private void apagarProduto(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_apagarProduto
-        
-    }//GEN-LAST:event_apagarProduto
+    private void apagarItemDeVenda(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_apagarItemDeVenda
+        int linhaSelecionada = tabelaVendas.getSelectedRow();
+        Object obj = tabelaVendas.getModel().getValueAt(linhaSelecionada, ID);
+        if (obj instanceof Long){
+            try {
+                Long id = (Long) obj;
+                pdv.apagarDoBanco(new ItemDeVenda(id, null, null));
+                atualizarTabela();
+                atualizarTotal();
+            } catch (SQLException ex) {
+                Logger.getLogger(JanelaItensDeVenda.class.getName()).log(Level.SEVERE, null, ex);
+            }
+        }
+            
+    }//GEN-LAST:event_apagarItemDeVenda
 
     
     private void atualizarTabela(){
-        String[] nomesDasColunas = {"Nome do Produto","Quantidade","Subtotal"};
+        String[] nomesDasColunas = {"ID","Nome do Produto","Quantidade","Subtotal"};
         // TODO Extrair para método
         List<ItemDeVenda> doBanco = new LinkedList();
         try {
@@ -194,16 +212,33 @@ public class JanelaItensDeVenda extends javax.swing.JFrame {
         Object[][] matriz = new Object[doBanco.size()][nomesDasColunas.length];
         int linha = 0;
         for(ItemDeVenda iv: doBanco){
-            matriz[linha][0] = iv.produto.descricao;
-            matriz[linha][1] = iv.quantidade;
-            matriz[linha][2] = iv.subtotal;
+            matriz[linha][ID] = iv.id;
+            matriz[linha][NOME_PRODUTO] = iv.produto.descricao;
+            matriz[linha][QUANTIDADE] = iv.quantidade;
+            matriz[linha][SUBTOTAL] = iv.subtotal;
             ++linha;
         }
         tabelaVendas.setModel(new DefaultTableModel(matriz,nomesDasColunas));
     }
     
     private void atualizarTotal() {
-        //TODO Atualizar total da Tela
+        try {
+            //TODO Atualizar total da Tela
+            int linhas = tabelaVendas.getModel().getRowCount();
+            int linha = 0;
+            Double total = 0.0;
+            while(linha < linhas){
+                Object obj = tabelaVendas.getModel().getValueAt(linha, SUBTOTAL);
+                if(obj instanceof Double)
+                    total += (Double) obj;
+                ++linha;
+            }
+            v.total = total;
+            pdv.atualizarTotalDaVendaNoBanco(v);
+            labelTotal.setText("Total: R$ "+(new DecimalFormat("#.##").format(v.total)));
+        } catch (SQLException ex) {
+            Logger.getLogger(JanelaItensDeVenda.class.getName()).log(Level.SEVERE, null, ex);
+        }
     }
     
     private void preencherComboBoxProdutos() {
@@ -227,8 +262,8 @@ public class JanelaItensDeVenda extends javax.swing.JFrame {
     private javax.swing.JButton botaoApagarVenda;
     private javax.swing.JButton botaoCadastrarItemDeVenda;
     private javax.swing.JComboBox<String> comboProdutos;
-    private javax.swing.JLabel jLabel1;
     private javax.swing.JScrollPane jScrollPane1;
+    private javax.swing.JLabel labelTotal;
     private javax.swing.JSpinner spinnerQtde;
     private javax.swing.JTable tabelaVendas;
     private javax.swing.JLabel textoProduto;

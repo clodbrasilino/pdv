@@ -188,7 +188,7 @@ public class JanelaVendas extends javax.swing.JFrame {
     private void editarProduto(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_editarProduto
         
     }//GEN-LAST:event_editarProduto
-
+    
     private void atualizarTabela(){
         String[] nomesDasColunas = {"ID","CPF","Total"};
         List<Venda> doBanco = new LinkedList<Venda>();

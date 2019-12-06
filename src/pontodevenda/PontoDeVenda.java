@@ -339,6 +339,7 @@ public class PontoDeVenda {
     public List<ItemDeVenda> obterItensDeVendaDoBanco(Venda v) throws SQLException {
         PreparedStatement pegaVendaDoBanco = conexao.prepareStatement(
             "select iv.quantidade as quantidade, "
+                    + "iv.id as id, "
                     + "p.id as id_produto, "
                     + "p.nome as nome_produto, "
                     + "p.valor_unitario as preco_produto, "
@@ -351,6 +352,7 @@ public class PontoDeVenda {
         List<ItemDeVenda> doBanco = new LinkedList();
         while(resultado.next()){
             doBanco.add(new ItemDeVenda(
+                resultado.getLong("id"),
                 new Produto(
                     resultado.getLong("id_produto"),
                     resultado.getString("nome_produto"),
@@ -361,5 +363,22 @@ public class PontoDeVenda {
             ));
         }
         return doBanco;
+    }
+    
+    public void atualizarTotalDaVendaNoBanco(Venda v) throws SQLException {
+        PreparedStatement consulta = conexao.prepareStatement(
+            "UPDATE venda v SET v.total = ? where v.id = ?"
+        );
+        consulta.setDouble(1, v.total);
+        consulta.setLong(2, v.id);
+        consulta.executeUpdate();
+    }
+    
+    public void apagarDoBanco(ItemDeVenda iv) throws SQLException {
+        PreparedStatement consulta = conexao.prepareStatement(
+            "DELETE FROM item_de_venda WHERE id = ?;"
+        );
+        consulta.setLong(1, iv.id);
+        consulta.executeUpdate();
     }
 }
